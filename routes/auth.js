@@ -1,8 +1,10 @@
+const VerifyUserMiddleware = require("./middlewares/verify.user.middleware");
 
 exports.authConfig = function (app) {
-   app.post('/auth/signup', (req, res) => {
-      const { password, email } = req.body;
-      console.log(password, email);
-      res.send("Auth route working")
-   })
+
+   app.post('/auth/signup', [
+      VerifyUserMiddleware.hasAuthValidFields,
+      VerifyUserMiddleware.checksEmailExists
+   ]);
+
 };
