@@ -63,3 +63,42 @@ exports.sendjwt = (req, res, next) => {
         token
     })
 }
+
+exports.checksEmailPassMatch = (req, res, next) => {
+   const { password, email } = req.body
+
+    const user = existingUsers.users.find((user) => {
+        return email === user.email
+    })
+
+    if (!user) {
+        return res.json({
+            "errors": [
+                {
+                    msg: "Invalid credentials"
+                }
+            ]
+        })
+    }
+
+    let passwordFields = user.password.split('$')
+    let salt = passwordFields[0]
+    let hashPass = crypto.createHmac('sha512', salt).update(password).digest("base64");
+
+    if (hashPass !== passwordFields[1]) {
+        return res.json({
+            "errors": [
+                {
+                    msg: "Invalid credentials"
+                }
+            ]
+        })
+    }
+
+    const jwt_secret = env_variables.jwt_secret
+    const token = JWT.sign({email}, jwt_secret)
+
+    res.json({
+        token
+    })
+}
