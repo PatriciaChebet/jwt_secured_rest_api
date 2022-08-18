@@ -6,7 +6,8 @@ exports.authConfig = function (app) {
    app.post('/auth/signup', [
       VerifyUserMiddleware.hasAuthValidFields,
       VerifyUserMiddleware.checksEmailExists,
-      VerifyUserMiddleware.hashPassword
+      VerifyUserMiddleware.hashPassword,
+      VerifyUserMiddleware.sendjwt
    ]);
 
    app.get('/auth/all', (req, res) => {
