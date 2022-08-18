@@ -10,6 +10,10 @@ exports.authConfig = function (app) {
       VerifyUserMiddleware.sendjwt
    ]);
 
+   app.post('/auth/login', [
+      VerifyUserMiddleware.checksEmailPassMatch
+   ]);
+
    app.get('/auth/all', (req, res) => {
       res.json(existingUsers.users)
    });
