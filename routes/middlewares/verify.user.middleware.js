@@ -1,6 +1,8 @@
 const { check, validationResult } = require('express-validator')
 const existingUsers = require('../../db')
 const crypto = require('crypto')
+const JWT = require('jsonwebtoken')
+const env_variables = require('../../common/config/env.config')
 
 
 exports.hasAuthValidFields = [check("email", "Please provide a valid email").isEmail(), check("password", "Please provide a password of length greater than 6").isLength({min: 6}), function (req, res, next) {
@@ -15,7 +17,6 @@ exports.hasAuthValidFields = [check("email", "Please provide a valid email").isE
     }
 
     return next();
-    //res.send("Validation passed!")
  }
 ]; 
 
@@ -36,7 +37,6 @@ exports.checksEmailExists = (req, res, next) => {
     })
     }
     return next()
-    //res.send("Validation passed!")
 }
 
 exports.hashPassword = (req, res, next) => {
@@ -45,11 +45,21 @@ exports.hashPassword = (req, res, next) => {
     let hash = crypto.createHmac('sha512', salt).update(password).digest('base64')
     let hashedPassword = salt + "$" + hash
 
-    console.log(hashedPassword)
     existingUsers.users.push({
         email: email,
         password: hashedPassword
     })
 
-    res.send("Validation and hashing complete!")
+    return next()
+}
+
+exports.sendjwt = (req, res, next) => {
+    const { email, password } = req.body
+    const jwt_secret = env_variables.jwt_secret
+
+    const token = JWT.sign({email}, jwt_secret)
+
+    res.json({
+        token
+    })
 }
